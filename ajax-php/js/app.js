@@ -1,11 +1,23 @@
-import { ping } from './api.js';
+import { getPosts } from './api.js';
 
-ping()
-  .then(data => {
-    document.getElementById('rep').textContent   = data.message;
-    document.getElementById('heure').textContent = data.time;
-  })
-  .catch(err => {
-    document.getElementById('rep').textContent = 'Erreur serveur';
-    console.error(err);
-  });
+async function loadPosts() {
+  const loader = document.getElementById('loader');
+  const err    = document.getElementById('err');
+  const list   = document.getElementById('posts');
+
+  loader.hidden = false;
+  err.textContent = '';
+  list.innerHTML = '';
+
+  try {
+    const posts = await getPosts();
+    list.innerHTML = posts.slice(0,5)
+                 .map(p => `<li>${p.title}</li>`).join('');
+  } catch (e) {
+    err.textContent = 'Erreur : ' + e.message;
+  } finally {
+    loader.hidden = true;
+  }
+}
+
+document.getElementById('loadBtn').addEventListener('click', loadPosts);

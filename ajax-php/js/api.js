@@ -1,2 +1,5 @@
-export const ping = () =>
-    fetch('api.php').then(r => r.json());
+export const getPosts = () =>
+    fetch('api.php?action=posts').then(async r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
