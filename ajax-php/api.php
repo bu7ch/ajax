@@ -1,15 +1,57 @@
 <?php
 header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
+
+$method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
-if ($action === 'posts') {
-    $posts = json_decode(file_get_contents('data/posts.json'), true); //chargement des posts
-    echo json_encode($posts);//retourne les posts sous forme de json
-    exit;
+$input  = json_decode(file_get_contents('php://input'), true);
+
+function read($file){
+    return json_decode(file_get_contents($file), true);
 }
-if ($action === 'stats') {
-    $stats = json_decode(file_get_contents('data/stats.json'),true);
-    echo json_encode($stats);
-    exit;
+function write($file, $data){
+    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
 }
-http_response_code(400);
-echo json_encode(['error' => 'action manquant']);//retourne une erreur si l'action est manquante
+
+switch ($action) {
+    /* --------- GET  (liste) --------- */
+    case 'posts':
+        if ($method === 'GET') {
+            echo json_encode(read('data/posts.json'));
+        }
+        break;
+
+    /* --------- POST (ajout) --------- */
+    case 'add':
+        if ($method === 'POST') {
+            $posts = read('data/posts.json');
+            $newId = empty($posts) ? 1 : max(array_column($posts, 'id')) + 1;
+            $new   = [
+                'id'    => $newId,
+                'title' => trim($input['title'] ?? ''),
+                'body'  => trim($input['body']  ?? '')
+            ];
+            if ($new['title'] === '') {
+                http_response_code(400);
+                echo json_encode(['error' => 'Titre requis']);
+                exit;
+            }
+            $posts[] = $new;
+            write('data/posts.json', $posts);
+            echo json_encode($new);
+        }
+        break;
+
+
+    /* --------- STATS (jour 1) ------- */
+    case 'stats':
+        echo json_encode(read('data/stats.json'));
+        break;
+
+    default:
+        http_response_code(400);
+        echo json_encode(['error' => 'Action invalide']);
+}
