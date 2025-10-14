@@ -1,4 +1,4 @@
-import { getPosts } from './api.js';
+import { getPosts, getStats } from './api.js';
 
 async function loadPosts() {
   const loader = document.getElementById('loader');
@@ -21,3 +21,15 @@ async function loadPosts() {
 }
 
 document.getElementById('loadBtn').addEventListener('click', loadPosts);
+
+async function loadStats() {
+  try {
+    const s = await getStats();
+    document.getElementById('stats').textContent =
+    `Total posts : ${s.totalsPosts} – Total users : ${s.totalsUsers}`;
+    console.log(s);
+  } catch (e) {
+    document.getElementById('stats').textContent = "Stats indisponibles";
+  }
+}
+document.getElementById('statsBtn').addEventListener('click', loadStats);
