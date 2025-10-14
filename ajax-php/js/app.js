@@ -18,7 +18,7 @@ function render(posts) {
 // ajout
 form.addEventListener('submit', async e => {
   e.preventDefault();
-  const data = Object.fromEntries(new FormData(form));
+  const data = Object.fromEntries(new FormData(form)); // strictement en mode formumaire
   const newPost = await addPost(data);
   allPosts.push(newPost);
   render(allPosts);

@@ -1,7 +1,7 @@
 const BASE = 'api.php';
 
 export const getPosts = () =>
-  fetch(`${BASE}?action=posts`).then(r => r.json());
+  fetch(`${BASE}?action=posts`).then(r => r.json());// recupérer le resultat du JSON des posts
 
 export const addPost = data =>
   fetch(`${BASE}?action=add`, {
