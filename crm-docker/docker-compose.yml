@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  php:
+    build: .
+    container_name: crm-php
+    ports:
+      - "8000:80"
+    volumes:
+      - ./crm:/var/www/html
+    networks:
+      - crm-network
+
+  db:
+    image: mariadb:10.11
+    container_name: crm-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: crm_ajax
+      MYSQL_USER: crm
+      MYSQL_PASSWORD: crmpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - crm-network
+
+  pma:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: crm-pma
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    networks:
+      - crm-network
+
+volumes:
+  db_data:
+
+networks:
+  crm-network:
+    driver: bridge
