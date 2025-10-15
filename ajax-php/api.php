@@ -39,9 +39,19 @@ switch ($action) {
                 echo json_encode(['error' => 'Titre requis']);
                 exit;
             }
-            $posts[] = $new;
+            $posts[] = $new; // charger les datas dans le tableau des datas
+            write('data/posts.json', $posts); // ecrire le JSON avec les valeurs de $posts
+            echo json_encode($new); // redonner le JSON au JS de la valeur new
+        }
+        break;
+          /* --------- DELETE --------------- */
+    case 'delete':
+        if ($method === 'DELETE') {
+            $id = (int)($_GET['id'] ?? 0);
+            $posts = read('data/posts.json');
+            $posts = array_values(array_filter($posts, fn($p) => $p['id'] != $id));
             write('data/posts.json', $posts);
-            echo json_encode($new);
+            echo json_encode(['ok' => true]);
         }
         break;
 

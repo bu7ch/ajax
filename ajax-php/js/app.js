@@ -1,4 +1,4 @@
-import { getPosts, addPost } from './api.js';
+import { getPosts, addPost, delPost } from './api.js';
 import { buildList } from './dom.js';
 
 const list   = document.getElementById('posts');
@@ -18,13 +18,26 @@ function render(posts) {
 // ajout
 form.addEventListener('submit', async e => {
   e.preventDefault();
-  const data = Object.fromEntries(new FormData(form)); // strictement en mode formumaire
-  const newPost = await addPost(data);
-  allPosts.push(newPost);
-  render(allPosts);
-  form.reset();
+  const data = Object.fromEntries(new FormData(form));
+  
+  try {
+    const newPost = await addPost(data);
+    allPosts.push(newPost);
+    render(allPosts);
+    form.reset();
+  } catch (error) {
+    console.error("Erreur lors de l'ajout du post :", error);
+  }
 });
-
+// suppression
+list.addEventListener('click', async e => {
+  if (!e.target.classList.contains('del')) return;
+  const id = +e.target.dataset.id;
+  if (!confirm('Supprimer ?')) return;
+  await delPost(id);
+  allPosts = allPosts.filter(p => p.id !== id);
+  render(allPosts);
+});
 
 // recherche dynamique
 search.addEventListener('input', () => {
